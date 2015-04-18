@@ -33,17 +33,18 @@ out += "\t\"desc\";\n"
 out += "\t" + str(7) + "; " + str(5) + "; 0; 0;\n"  
 
 out += "\t[\n"
-for i in range(5):
+for i in range(4):
     out += "\t\t{ " + str(data[i]["parent"]) + "; " + str(data[i]["child"]) + "; },\n"
     # pprint(data[i]["parent"] + data[i]["child"])
     print(str(data[i]["parent"]), " ", str(data[i]["child"]))
+out += "\t\t{ " + str(data[4]["parent"]) + "; " + str(data[4]["child"]) + "; }\n"
 out += "\t];\n"
 
 # path list
-out += "\t;" 
+out += "\t; ;" 
 
 # enum-def, attr-def, qualifer lists
-out += "\t; ; ;\n"
+out += "\n\t; ; ;\n"
 
 # visualization hints
 out += "\t; ; ; ;\n"
@@ -52,7 +53,7 @@ out += "\t; ; ; ;\n"
 out += "\t; ; ; ; ;\n"
 
 # file end
-out += "}"
+out += "}\n"
 print out
 
 f = open('out', 'w')
