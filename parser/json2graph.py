@@ -1,14 +1,20 @@
 import json, os, sys
+from operator import itemgetter
 from pprint import pprint
 
 data = json.loads(open("edges.json").read())
 
 # pprint(data)
 # print json.dumps(data,indent=1)
-
-
+tmplen = len(data)
+partial_size = 1315
+for i in xrange(partial_size ,tmplen ):
+    del data[partial_size]
 # get # of links
 print(len(data))
+sorted(data, key=itemgetter('parent'))
+
+data = sorted(data, key=itemgetter('parent'))
 
 '''
 # get # of nodes
@@ -54,6 +60,9 @@ child_ids = set([d["child"] for d in data])
 # all ids
 all_ids = parent_ids.union(child_ids) 
 
+mxv = max(all_ids)
+print "\n\n" + str(all_ids - set(range(mxv)))
+
 # root nodes only
 root_node_ids = parent_ids - child_ids
 
@@ -68,13 +77,38 @@ for root_node_id in root_node_ids:
                  'child': root_node_id})
     print "added ancestor edge: {0}, {1}".format(ancestor_id, root_node_id)
 
-# make sure all circles cleaned
+
+
+# make node list linear by adding dummy node (n) and dummy edge (n-1, n)
+# remember to paint them transparent
+# print(set(dic.keys()) - set(range(max(dic) + 1)))
+# print(set(range(max(all_ids) + 1)) - set(all_ids))
+unused_ids = set(range(max(all_ids) + 1)) - set(all_ids)
+print "unused id numbers: " + str(unused_ids)
+for num in unused_ids:
+    data.append({'parent': ancestor_id,
+                 'child' : num })
+    print "added accessory edge: {0}, {1}".format(ancestor_id, num)
+all_ids = all_ids.union(unused_ids)
+
+
+'''
+parent_ids = set([d["parent"] for d in data]) 
+child_ids = set([d["child"] for d in data]) 
+all_ids = parent_ids.union(child_ids) 
+print "\n " + str(all_ids - set(range(max(all_ids) + 1)))
+
+'''
+
+
+
+# recheck: make sure all circles cleaned
 dupcount = []
 #for i in range(10):
 #    for j in xrange(i + 1,10):
 for i in range(len(data)):
     for j in xrange(i + 1, len(data)):
-        if data[i]["child"] == data[j]["child"] and data[i]["parent"] != data[j]["parent"]:
+        if data[i]["child"] == data[j]["child"]:
             print (
                     str(data[i]["parent"]) + " " + str(data[i]["child"]) + 
                     ") and (" + 
@@ -94,6 +128,7 @@ print(len(dic))
 
 
 
+data = sorted(data, key=itemgetter('parent','child'))
 
 
 out = "Graph\n{\n"
@@ -127,7 +162,7 @@ out += ("\t@enumerations=;\n" +
        "\t\t\t@name=$root;\n"+
        "\t\t\t@type=bool;\n"+
        "\t\t\t@default=|| false ||;\n"+
-       "\t\t\t@nodeValues=[ { @id=0; @value=T; } ];\n"+
+       "\t\t\t@nodeValues=[ { @id=" + str(ancestor_id) + "; @value=T; } ];\n"+
        "\t\t\t@linkValues=;\n"+
        "\t\t\t@pathValues=;\n"+
        "\t\t},\n"+
